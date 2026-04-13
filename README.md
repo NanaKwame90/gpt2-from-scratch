@@ -1,93 +1,109 @@
-# Assignment4
+GPT-from-Scratch: Generative Transformer Implementation
+A from-scratch implementation of a GPT-style Decoder-only Transformer architecture, developed for the M.Sc. Cognitive Systems program at the University of Potsdam. This project demonstrates the fundamental mechanics of Large Language Models (LLMs), including causal self-attention, layer normalization, and advanced decoding strategies.
 
 
+## Project structure
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitup.uni-potsdam.de/agyemangdu/assignment4.git
-git branch -M main
-git push -uf origin main
+```text
+gpt2-from-scratch/
+├── model/
+│   └── model_gpt.py    # Core architecture (Multi-head Attention, Transformer Blocks)
+├── data/               # ← gitignored; place Frankenstein.txt here
+├── utils.py            # Tokenization (tiktoken) and decoding logic
+├── train.py            # Training script with evaluation loops
+├── assignment4.py      # Main entry point for inference and evaluation
+├── config.json         # Model configuration parameters
+├── Dockerfile          # Containerization for environment reproducibility
+├── requirements.txt    # Project dependencies
+└── .gitignore          # Rules to exclude weights (.pth) and .venv
 ```
 
-## Integrate with your tools
+---
 
-* [Set up project integrations](https://gitup.uni-potsdam.de/agyemangdu/assignment4/-/settings/integrations)
+## 1. Set up the environment
 
-## Collaborate with your team
+```bash
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
 
-* [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+pip install -r requirements.txt
+```
 
-## Test and Deploy
+Python ≥ 3.10 recommended.
 
-Use the built-in continuous integration in GitLab.
+---
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## 2. Obtain and place the dataset
+### Place it in the data/ directory:
 
-***
+data/Frankenstein.txt
 
-# Editing this README
+---
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## 3. Run the experiments
+### Model Training
 
-## Suggestions for a good README
+```bash
+python train.py
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Text Generation (Inference)
 
-## Name
-Choose a self-explaining name for your project.
+```bash
+# Default generation (using settings in config.json)
+python assignment4.py
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+---
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## 4. Technical Features & Deliverables
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+| Artifact | Description |
+|:---------|:------------|
+| `model/model_gpt.py` | Implementation of Causal Self-Attention and Feed-Forward blocks |
+| `utils.py` | Logic for Temperature scaling, Top-k, and Nucleus (Top-p) sampling |
+| `loss-plot.png` | Visualization of training and validation loss over epochs |
+| `Dockerfile` | Multi-platform build instructions for GPU/CPU parity |
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+---
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## 5. Configuration defaults
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+All architectural defaults live in `config.json`:
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+| Parameter | Default | Description |
+|:----------|:--------|:------------|
+| `n_layer` | 12 | Number of Transformer blocks |
+| `n_head` | 12 | Number of attention heads |
+| `n_embd` | 768 | Embedding dimension size |
+| `block_size` | 1024 | Maximum sequence length (context window) |
+| `top_p` | 0.9 | Probability threshold for Nucleus sampling |
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+---
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## 6. Reproducibility
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+- `torch.manual_seed(42)` is used throughout to ensure deterministic behavior across training runs.
+- The provided `Dockerfile` allows for building a consistent environment regardless of host OS (Linux/Windows/macOS).
+- `torch.backends.mps.is_available()` is checked to ensure hardware acceleration on Apple Silicon (M-series), while `torch.cuda.is_available()` is used for NVIDIA hardware.
+- `torch.backends.cudnn.deterministic = True` is set when running on CUDA to ensure reproducibility of convolution/attention layers.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+---
 
-## License
-For open source projects, say how it is licensed.
+## References
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- Radford et al., *Language Models are Unsupervised Multitask Learners* (GPT-2).
+- Advanced Natural Language Processing Course, University of Potsdam.
+- OpenAI `tiktoken` documentation for BPE tokenization strategies.
+
+
+
+
+
+
+
+
+
